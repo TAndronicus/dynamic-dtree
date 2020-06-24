@@ -4,8 +4,6 @@ import java.util.stream.IntStream
 
 import jb.conf.Config
 import jb.io.FileReader.getRawInput
-import jb.model._
-import jb.model.dt.{CombinedIntegratedDecisionTreeModel, EdgeIntegratedDecisionTreeModel, MomentIntegratedDecisionTreeModel}
 import jb.parser.TreeParser
 import jb.prediction.Predictions.predictBaseClfs
 import jb.selector.FeatureSelectors
@@ -39,18 +37,21 @@ class Runner(val nClassif: Int, var nFeatures: Int, val coefficients: Coefficien
 
     val (mins, maxes) = getExtrema(input, getSelectedFeatures(dataPrepModel))
 
-    val nSubsets = nClassif + 2
+    val nSubsets = nClassif + 1
     val subsets = input.randomSplit(IntStream.range(0, nSubsets).mapToDouble(_ => 1D / nSubsets).toArray)
     recacheInput2Subsets(input, subsets)
-    val (trainingSubsets, cvSubset, testSubset) = dispenseSubsets(subsets)
+    val (trainingSubsets, testSubset) = dispenseSubsets(subsets)
     val trainingSubset = unionSubsets(trainingSubsets)
 
-    val dt = new DecisionTreeClassifier()
-      .setLabelCol(LABEL)
-      .setFeaturesCol(FEATURES)
-      .setImpurity(Config.impurity)
-      .setMaxDepth(Config.maxDepth)
-    val baseModels = trainingSubsets.map(subset => dt.fit(subset))
+    def getEmptyDT = {
+      new DecisionTreeClassifier()
+        .setLabelCol(LABEL)
+        .setFeaturesCol(FEATURES)
+        .setImpurity(Config.impurity)
+        .setMaxDepth(Config.maxDepth)
+    }
+
+    val baseModels = trainingSubsets.map(subset => getEmptyDT.fit(subset))
 
     val testedSubset = predictBaseClfs(baseModels, testSubset)
     val mvQualityMeasure = testMv(testedSubset, nClassif)
@@ -61,10 +62,10 @@ class Runner(val nClassif: Int, var nFeatures: Int, val coefficients: Coefficien
     // TODO: batch by moments calculation method
     val moments = if (coefficients.momentDependent) mappingModel match {
       case PreTraining() => calculateMomentsByLabels(input, getSelectedFeatures(dataPrepModel))
-      case PostTrainingCV() => calculateMomentsByPredictionCollectively(cvSubset, getSelectedFeatures(dataPrepModel), baseModels, false)
+      //      case PostTrainingCV() => calculateMomentsByPredictionCollectively(cvSubset, getSelectedFeatures(dataPrepModel), baseModels, false)
       case PostTrainingTrain() => calculateMomentsByPredictionRespectively(trainingSubsets, getSelectedFeatures(dataPrepModel), baseModels, false)
       case PostTrainingAll() => calculateMomentsByPredictionCollectively(input, getSelectedFeatures(dataPrepModel), baseModels, false)
-      case PostTrainingCVFiltered() => calculateMomentsByPredictionCollectively(cvSubset, getSelectedFeatures(dataPrepModel), baseModels, true)
+      //      case PostTrainingCVFiltered() => calculateMomentsByPredictionCollectively(cvSubset, getSelectedFeatures(dataPrepModel), baseModels, true)
       case PostTrainingTrainFiltered() => calculateMomentsByPredictionRespectively(trainingSubsets, getSelectedFeatures(dataPrepModel), baseModels, true)
       case PostTrainingAllFiltered() => calculateMomentsByPredictionCollectively(input, getSelectedFeatures(dataPrepModel), baseModels, true)
     } else null

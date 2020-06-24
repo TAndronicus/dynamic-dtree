@@ -58,11 +58,10 @@ object Util {
     * @param subsets - array of subsets to dispense
     * @return
     */
-  def dispenseSubsets(subsets: Array[DataFrame]): (Array[DataFrame], DataFrame, DataFrame) = {
-    val trainingSubsets = subsets.take(subsets.length - 2)
-    val cvSubset = subsets(subsets.length - 2)
+  def dispenseSubsets(subsets: Array[DataFrame]): (Array[DataFrame], DataFrame) = {
+    val trainingSubsets = subsets.take(subsets.length - 1)
     val testSubset = subsets.last
-    (trainingSubsets, cvSubset, testSubset)
+    (trainingSubsets, testSubset)
   }
 
   def unionSubsets(subsets: Array[DataFrame]): DataFrame = {
