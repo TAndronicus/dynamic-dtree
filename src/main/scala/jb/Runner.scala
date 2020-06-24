@@ -4,7 +4,7 @@ import java.util.stream.IntStream
 
 import jb.conf.Config
 import jb.io.FileReader.getRawInput
-import jb.parser.TreeParser
+import jb.parser.TreeParser1
 import jb.prediction.Predictions.predictBaseClfs
 import jb.selector.FeatureSelectors
 import jb.server.SparkEmbedded
@@ -86,7 +86,7 @@ class Runner(val nClassif: Int, var nFeatures: Int, val coefficients: Coefficien
 
   private def getEdges(mins: Array[Double], maxes: Array[Double], baseModels: Array[DecisionTreeClassificationModel]): Array[Array[Edge]] = {
     val rootRect = Rect(mins, maxes)
-    val treeParser = new TreeParser()
+    val treeParser = new TreeParser1()
     val rects = baseModels.map(model => treeParser.dt2rect(rootRect, model.rootNode))
     rects.map(treeParser.rects2edges)
   }

@@ -1,9 +1,8 @@
 package jb.parser
 
-import jb.model.{Edge, Rect}
 import org.scalatest.FunSuite
 
-class TreeParserTest extends FunSuite {
+class TreeParser1Test extends FunSuite {
 
   test("rects2edges") {
     // given
@@ -21,7 +20,7 @@ class TreeParserTest extends FunSuite {
     )
 
     // when
-    val treeParser = new TreeParser()
+    val treeParser = new TreeParser1()
     val edges = treeParser.rects2edges(rects)
 
     // then
@@ -34,7 +33,7 @@ class TreeParserTest extends FunSuite {
     val r2 = Rect(Array(1, 2, 6), Array(7, 8, 9))
 
     // when
-    val treeParser = new TreeParser()
+    val treeParser = new TreeParser1()
     val areAdjacent = treeParser.areAdjacent((r1, r2))
 
     // then
@@ -47,7 +46,7 @@ class TreeParserTest extends FunSuite {
     val r2 = Rect(Array(2, 4, 6), Array(3, 6, 9))
 
     // when
-    val treeParser = new TreeParser()
+    val treeParser = new TreeParser1()
     val areAdjacent = treeParser.areAdjacent((r1, r2))
 
     // then
@@ -60,7 +59,7 @@ class TreeParserTest extends FunSuite {
     val r2 = Rect(Array(3, 0), Array(5, 1))
 
     // when
-    val treeParser = new TreeParser()
+    val treeParser = new TreeParser1()
     val areAdjacent = treeParser.areAdjacent((r1, r2))
 
     // then
@@ -74,7 +73,7 @@ class TreeParserTest extends FunSuite {
     val r3 = Rect(Array(1, 2, 3), Array(2, 4, 6), 1D)
 
     // when
-    val treeParser = new TreeParser()
+    val treeParser = new TreeParser1()
     val same12 = treeParser.areOfSameClasses((r1, r2))
     val same13 = treeParser.areOfSameClasses((r1, r3))
 
@@ -89,7 +88,7 @@ class TreeParserTest extends FunSuite {
     val r2 = Rect(Array(5, 1), Array(6, 2))
 
     // when
-    val treeParser = new TreeParser()
+    val treeParser = new TreeParser1()
     val edge = treeParser.createEdge((r1, r2))
 
     // then
