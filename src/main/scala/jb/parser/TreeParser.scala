@@ -9,14 +9,13 @@ class TreeParser {
     tree match {
       case leaf: LeafNode => List()
       case branch: InternalNode => branch.split match {
-        case contSplit: ContinuousSplit => {
+        case contSplit: ContinuousSplit =>
           (extractCutpointsRecursively(branch.leftChild)
             ::: ((contSplit.featureIndex -> contSplit.threshold)
             :: extractCutpointsRecursively(branch.rightChild)))
-        }
-        case _ => throw Exception("Unsupported split")
+        case _ => throw new Exception("Unsupported split")
       }
-      case _ => throw Exception("Unsupported node")
+      case _ => throw new Exception("Unsupported node")
     }
   }
 
