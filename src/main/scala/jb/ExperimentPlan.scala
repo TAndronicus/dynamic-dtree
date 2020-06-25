@@ -14,7 +14,9 @@ object ExperimentPlan {
     //    val (beta1, beta2) = (.5, 0)
     //    val (gamma1, gamma2) = (20, 5)
 
-    MultiRunner.run(nC, nFeatures)
+    for (nC <- nClassifs) {
+      MultiRunner.run(nC, nFeatures)
+    }
   }
 
 }
