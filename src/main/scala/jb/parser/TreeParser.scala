@@ -1,6 +1,5 @@
 package jb.parser
 
-import jb.model.Cube
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.tree.{ContinuousSplit, InternalNode, LeafNode, Node}
 
@@ -22,11 +21,11 @@ class TreeParser {
   }
 
   def extractCutpoints(trees: List[DecisionTreeClassificationModel]): Unit = {
-    trees.flatMap(extractCutpointsTree)
-  }
-
-  private def extractCutpointsTree(tree: DecisionTreeClassificationModel): List[Cube] = {
-    extractCutpointsRecursively(tree.rootNode, Array())
+    val (x1cutpoints, x2cutpoints) = trees.map(_.rootNode)
+      .flatMap(extractCutpointsRecursively)
+      .distinct
+      .partition({ case (feature, _) => feature == 0 })
+    print("")
   }
 
 }
