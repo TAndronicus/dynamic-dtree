@@ -4,6 +4,7 @@ import java.util.stream.IntStream
 
 import jb.conf.Config
 import jb.io.FileReader.getRawInput
+import jb.parser.TreeParser
 import jb.prediction.Predictions.predictBaseClfs
 import jb.selector.FeatureSelectors
 import jb.server.SparkEmbedded
@@ -50,6 +51,8 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
     }
 
     val baseModels = trainingSubsets.map(subset => getEmptyDT.fit(subset))
+
+    new TreeParser().extractCutpoints(baseModels.toList)
 
     val testedSubset = predictBaseClfs(baseModels, testSubset)
     val mvQualityMeasure = testMv(testedSubset, nClassif)
