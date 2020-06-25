@@ -1,14 +1,13 @@
 package jb
 
 import jb.conf.Config
-import jb.model.{Coefficients, MappingModel}
 import jb.util.Const.FILENAME_PREFIX
 import jb.util.result.{LeastBatchExhaustiveResultCatcher, ResultCatcher}
 
 object MultiRunner {
 
 
-  def run(nClassif: Int, nFeatures: Int, coefficients: Coefficients, mappingModel: MappingModel): Unit = {
+  def run(nClassif: Int, nFeatures: Int): Unit = {
     coefficients.validate()
     val filenames = Array("bi", "bu", "c", "d", "h", "i", "m", "p", "se", "wd", "wi")
 
