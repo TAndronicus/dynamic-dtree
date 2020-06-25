@@ -8,13 +8,12 @@ object MultiRunner {
 
 
   def run(nClassif: Int, nFeatures: Int): Unit = {
-    coefficients.validate()
     val filenames = Array("bi", "bu", "c", "d", "h", "i", "m", "p", "se", "wd", "wi")
 
-    val runner = new Runner(nClassif, nFeatures, coefficients, mappingModel)
+    val runner = new Runner(nClassif, nFeatures)
     val resultCatcher = runForFiles(runner)(filenames)
 
-    resultCatcher.writeScores(Array(nClassif.toString, coefficients.getAllCoefficients.mkString("_")))
+    //    resultCatcher.writeScores(Array(nClassif.toString, coefficients.getAllCoefficients.mkString("_")))
   }
 
   private def runForFiles(runner: Runner)(filenames: Array[String]): ResultCatcher = {

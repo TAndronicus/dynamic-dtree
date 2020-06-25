@@ -17,7 +17,7 @@ import jb.vectorizer.FeatureVectorizers.getFeatureVectorizer
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, DecisionTreeClassifier}
 
-class Runner(val nClassif: Int, var nFeatures: Int, val coefficients: Coefficients, val mappingModel: MappingModel) {
+class Runner(val nClassif: Int, var nFeatures: Int) {
 
   def calculateMvIScores(filename: String): Array[Double] = {
 
