@@ -9,9 +9,8 @@ class TreeParser(mappingFunction: Map[Double, Map[Double, Int]] => Double) {
   def composeTree(trees: List[DecisionTreeClassificationModel]) = {
     val cubes = extractCubes(trees)
     val pairedCubes = pairWithNeigbors(cubes)
-    val labelledCubes = voteForLabel(pairedCubes)
-    println("")
-    (extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees)
+    voteForLabel(pairedCubes)
+    //    (extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees) // TODO: compose functions
   }
 
   private def pairWithNeigbors(cubes: List[CountingCube]): Map[CountingCube, List[WeightingCube]] =
