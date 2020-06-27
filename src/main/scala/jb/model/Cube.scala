@@ -1,7 +1,28 @@
 package jb.model
 
-case class Cube(min: List[Double], max: List[Double])
+import org.apache.spark.ml.linalg
 
-case class CountingCube(min: List[Double], max: List[Double], labelCount: Map[Int, Int])
+case class Cube(min: List[Double], max: List[Double]) {
+  def getMidAsMlVector = new linalg.DenseVector(min.zip(max)
+    .map { case (xMin, xMax) => (xMin + xMax) / 2 }
+    .toArray)
 
-case class LabelledCube(min: List[Double], max: List[Double], label: Int)
+}
+
+case class CountingCube(min: List[Double], max: List[Double], labelCount: Map[Double, Int])
+
+object CountingCube {
+  def fromCube(cube: Cube, labelCount: Map[Double, Int]) = CountingCube(cube.min, cube.max, labelCount)
+}
+
+case class LabelledCube(min: List[Double], max: List[Double], label: Double)
+
+object LabelledCube {
+  def fromCountingCube(cube: CountingCube) = LabelledCube(
+    cube.min,
+    cube.max,
+    cube.labelCount
+      .maxBy { case (_, value) => value }
+      ._1
+  )
+}

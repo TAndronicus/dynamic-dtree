@@ -1,6 +1,6 @@
 package jb.parser
 
-import jb.model.Cube
+import jb.model.{CountingCube, Cube, LabelledCube}
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.tree.{ContinuousSplit, InternalNode, LeafNode, Node}
 
@@ -20,18 +20,24 @@ class TreeParser {
     }
   }
 
-  def extractCutpoints(trees: List[DecisionTreeClassificationModel]): Unit = {
+  def extractCutpoints(trees: List[DecisionTreeClassificationModel]): List[LabelledCube] = {
     val (x1cutpoints, x2cutpoints) = trees.map(_.rootNode)
       .flatMap(extractCutpointsRecursively)
       .distinct
       .partition({ case (feature, _) => feature == 0 })
-    val cp = cutpointsCrossProd(
+    cutpointsCrossProd(
       extractCutpointsFromPartitions(x1cutpoints),
       extractCutpointsFromPartitions(x2cutpoints)
     )
       .map { case ((minX1, maxX1), (minX2, maxX2)) => Cube(List(minX1, minX2), List(maxX1, maxX2)) }
-    print("")
+      .map(cube => CountingCube.fromCube(cube, classifyMid(cube, trees)))
+      .map(LabelledCube.fromCountingCube)
   }
+
+  private def classifyMid(cube: Cube, trees: List[DecisionTreeClassificationModel]) = trees
+    .map(_.predict(cube.getMidAsMlVector))
+    .groupBy(identity)
+    .mapValues(_.size)
 
   private def extractCutpointsFromPartitions(cutpointPartition: List[Tuple2[Int, Double]]) = cutpointPartition
     .map { case (_, value) => value }
