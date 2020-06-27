@@ -16,13 +16,3 @@ object CountingCube {
 }
 
 case class LabelledCube(min: List[Double], max: List[Double], label: Double)
-
-object LabelledCube {
-  def fromCountingCube(cube: CountingCube) = LabelledCube(
-    cube.min,
-    cube.max,
-    cube.labelCount
-      .maxBy { case (_, value) => value }
-      ._1
-  )
-}

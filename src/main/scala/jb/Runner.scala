@@ -52,11 +52,11 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
 
     val baseModels = trainingSubsets.map(subset => getEmptyDT.fit(subset))
 
-    new TreeParser().extractCutpoints(baseModels.toList)
-
     val testedSubset = predictBaseClfs(baseModels, testSubset)
     val mvQualityMeasure = testMv(testedSubset, nClassif)
     val rfQualityMeasure = testRF(trainingSubset, testSubset, nClassif)
+
+    new TreeParser().composeTree(baseModels.toList) // TODO: parametrize with weighting function
 
     //    val integratedModel =
     //      if (coefficients.onlyEdgeDependent) new EdgeIntegratedDecisionTreeModel(baseModels, singleMapping(coefficients), sumOfWeights, edges)

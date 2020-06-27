@@ -1,12 +1,16 @@
 package jb.parser
 
-import jb.model.{CountingCube, Cube, LabelledCube}
+import jb.model.{CountingCube, Cube}
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.tree.{ContinuousSplit, InternalNode, LeafNode, Node}
 
 class TreeParser {
 
-  def extractCutpointsRecursively(tree: Node): List[Tuple2[Int, Double]] = {
+  def composeTree(trees: List[DecisionTreeClassificationModel]) = {
+    val cubes = extractCubes(trees)
+  }
+
+  private def extractCutpointsRecursively(tree: Node): List[Tuple2[Int, Double]] = {
     tree match {
       case leaf: LeafNode => List()
       case branch: InternalNode => branch.split match {
@@ -20,7 +24,7 @@ class TreeParser {
     }
   }
 
-  def extractCutpoints(trees: List[DecisionTreeClassificationModel]): List[LabelledCube] = {
+  private def extractCubes(trees: List[DecisionTreeClassificationModel]): List[CountingCube] = {
     val (x1cutpoints, x2cutpoints) = trees.map(_.rootNode)
       .flatMap(extractCutpointsRecursively)
       .distinct
@@ -31,7 +35,6 @@ class TreeParser {
     )
       .map { case ((minX1, maxX1), (minX2, maxX2)) => Cube(List(minX1, minX2), List(maxX1, maxX2)) }
       .map(cube => CountingCube.fromCube(cube, classifyMid(cube, trees)))
-      .map(LabelledCube.fromCountingCube)
   }
 
   private def classifyMid(cube: Cube, trees: List[DecisionTreeClassificationModel]) = trees
