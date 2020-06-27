@@ -24,7 +24,31 @@ class TreeParser {
       .flatMap(extractCutpointsRecursively)
       .distinct
       .partition({ case (feature, _) => feature == 0 })
+    val cp = cutpointsCrossProd(
+      extractCutpointsFromPartitions(x1cutpoints),
+      extractCutpointsFromPartitions(x2cutpoints)
+    )
     print("")
   }
+
+  private def extractCutpointsFromPartitions(cutpointPartition: List[Tuple2[Int, Double]]) = cutpointPartition
+    .map { case (_, value) => value }
+
+  private def cutpointsCrossProd(x1cutpoints: List[Double], x2cutpoints: List[Double]) =
+    crossProd(
+      pairNeighbors(withLimits(x1cutpoints)),
+      pairNeighbors(withLimits(x2cutpoints))
+    )
+
+  private def withLimits(l: List[Double]): List[Double] = 0.0 :: l.sorted ::: 1.0 :: Nil
+
+  private def pairNeighbors(l: List[Double]) = l.sliding(2, 1)
+    .map(n => (n(0), n(1)))
+    .toList
+
+  private def crossProd[A](l1: List[A], l2: List[A]) = for {
+    x1 <- l1
+    x2 <- l2
+  } yield (x1, x2)
 
 }
