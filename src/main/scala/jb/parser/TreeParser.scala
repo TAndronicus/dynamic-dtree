@@ -1,5 +1,6 @@
 package jb.parser
 
+import jb.model.Cube
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.tree.{ContinuousSplit, InternalNode, LeafNode, Node}
 
@@ -28,6 +29,7 @@ class TreeParser {
       extractCutpointsFromPartitions(x1cutpoints),
       extractCutpointsFromPartitions(x2cutpoints)
     )
+      .map { case ((minX1, maxX1), (minX2, maxX2)) => Cube(List(minX1, minX2), List(maxX1, maxX2)) }
     print("")
   }
 
