@@ -9,10 +9,21 @@ case class Cube(min: List[Double], max: List[Double]) {
 
 }
 
-case class CountingCube(min: List[Double], max: List[Double], labelCount: Map[Double, Int])
+case class CountingCube(min: List[Double], max: List[Double], labelCount: Map[Double, Int]) {
+  def isNeighborOf(cube: CountingCube) =
+    min.indices
+      .forall(index => cube.min(index) == min(index)
+        || cube.min(index) == max(index)
+        || cube.max(index) == min(index)
+        || cube.max(index) == max(index))
+
+  def withDistance(dist: Double) = WeightingCube(min, max, labelCount, dist)
+}
 
 object CountingCube {
   def fromCube(cube: Cube, labelCount: Map[Double, Int]) = CountingCube(cube.min, cube.max, labelCount)
 }
+
+case class WeightingCube(min: List[Double], max: List[Double], labelCount: Map[Double, Int], distance: Double)
 
 case class LabelledCube(min: List[Double], max: List[Double], label: Double)

@@ -56,7 +56,15 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
     val mvQualityMeasure = testMv(testedSubset, nClassif)
     val rfQualityMeasure = testRF(trainingSubset, testSubset, nClassif)
 
-    new TreeParser().composeTree(baseModels.toList) // TODO: parametrize with weighting function
+    val mappingFunction: Map[Double, Map[Double, Int]] => Double = _
+      .map { case (dist, labels) => labels.mapValues(_ * (1 - dist)) }
+      .reduce((m1, m2) => (m1.toSeq ++ m2.toSeq)
+        .groupBy(_._1)
+        .mapValues(_.map(_._2).sum)) // TODO: compose with type classes: https://stackoverflow.com/questions/20047080/scala-merge-map
+      .maxBy { case (_, weight) => weight }
+      ._1
+
+    val cubes = new TreeParser(mappingFunction).composeTree(baseModels.toList) // TODO: parametrize with weighting function
 
     //    val integratedModel =
     //      if (coefficients.onlyEdgeDependent) new EdgeIntegratedDecisionTreeModel(baseModels, singleMapping(coefficients), sumOfWeights, edges)

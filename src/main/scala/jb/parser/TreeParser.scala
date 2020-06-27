@@ -1,18 +1,37 @@
 package jb.parser
 
-import jb.model.{CountingCube, Cube}
+import jb.model.{CountingCube, Cube, LabelledCube, WeightingCube}
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.tree.{ContinuousSplit, InternalNode, LeafNode, Node}
 
-class TreeParser {
+class TreeParser(mappingFunction: Map[Double, Map[Double, Int]] => Double) {
 
   def composeTree(trees: List[DecisionTreeClassificationModel]) = {
     val cubes = extractCubes(trees)
+    val pairedCubes = pairWithNeigbors(cubes)
+    val labelledCubes = voteForLabel(pairedCubes)
+    println("")
+    (extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees)
   }
+
+  private def pairWithNeigbors(cubes: List[CountingCube]): Map[CountingCube, List[WeightingCube]] =
+    (for {
+      cube <- cubes
+      neighbor <- cubes if cube isNeighborOf neighbor
+    } yield (cube, neighbor.withDistance(0))) // TODO: weight
+      .groupBy { case (center, _) => center }
+      .mapValues(_.map(_._2))
+
+  private def voteForLabel(cubes: Map[CountingCube, List[WeightingCube]]): List[LabelledCube] =
+    cubes
+      .mapValues(_.map(wc => (wc.distance, wc.labelCount)).toMap)
+      .mapValues(mappingFunction)
+      .map { case (cc, label) => LabelledCube(cc.min, cc.max, label) }
+      .toList
 
   private def extractCutpointsRecursively(tree: Node): List[Tuple2[Int, Double]] = {
     tree match {
-      case leaf: LeafNode => List()
+      case _: LeafNode => List()
       case branch: InternalNode => branch.split match {
         case contSplit: ContinuousSplit =>
           (extractCutpointsRecursively(branch.leftChild)
