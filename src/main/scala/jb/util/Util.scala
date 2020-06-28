@@ -18,17 +18,16 @@ object Util {
     for (max <- maxes) require(max == 1)
   }
 
-  def getExtrema(input: DataFrame, selectedFeatures: Array[Int]): (Array[Double], Array[Double]) = {
+  def getExtrema(input: DataFrame, selectedFeatures: Array[Int]): Unit = {
     var paramMap = List.newBuilder[(String, String)]
     for (item <- selectedFeatures.sorted; fun <- Array("min", "max")) {
       paramMap += (COL_PREFIX + item -> fun)
     }
     val extrema = input.agg(paramMap.result().head, paramMap.result().drop(1): _*).head.toSeq.toIndexedSeq
-    val mins = extrema.sliding(1, 2).flatten.map(value => parseDouble(value)).toArray
-    val maxes = extrema.drop(1).sliding(1, 2).flatten.map(value => parseDouble(value)).toArray
-
-    requireNormalized(mins, maxes)
-    (mins, maxes)
+    requireNormalized(
+      extrema.sliding(1, 2).flatten.map(value => parseDouble(value)).toArray,
+      extrema.drop(1).sliding(1, 2).flatten.map(value => parseDouble(value)).toArray
+    )
   }
 
   def optimizeInput(input: DataFrame, dataPrepModel: PipelineModel): DataFrame = {

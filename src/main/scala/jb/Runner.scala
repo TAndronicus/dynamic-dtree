@@ -33,8 +33,7 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
     val dataPrepModel = dataPrepPipeline.fit(input)
     input = optimizeInput(input, dataPrepModel)
 
-    val (mins, maxes) = getExtrema(input, getSelectedFeatures(dataPrepModel))
-    //TODO normalize
+    getExtrema(input, getSelectedFeatures(dataPrepModel))
 
     val nSubsets = nClassif + 1
     val subsets = input.randomSplit(IntStream.range(0, nSubsets).mapToDouble(_ => 1D / nSubsets).toArray)
