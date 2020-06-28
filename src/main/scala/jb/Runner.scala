@@ -67,10 +67,6 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
     val integratedModel = new TreeParser(mappingFunction).composeTree(baseModels.toList) // TODO: parametrize with weighting function
     integratedModel.checkDiversity(filename)
 
-    //    val integratedModel =
-    //      if (coefficients.onlyEdgeDependent) new EdgeIntegratedDecisionTreeModel(baseModels, singleMapping(coefficients), sumOfWeights, edges)
-    //      else if (coefficients.onlyMomentDependent) new MomentIntegratedDecisionTreeModel(baseModels, singleMapping(coefficients), sumOfWeights, moments)
-    //      else new CombinedIntegratedDecisionTreeModel(baseModels, composedMapping(coefficients), sumOfWeights, edges, moments)
     val iPredictions = integratedModel.transform(testedSubset)
     val iQualityMeasure = testI(iPredictions, testedSubset)
 

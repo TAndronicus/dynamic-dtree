@@ -13,7 +13,7 @@ object MultiRunner {
     val runner = new Runner(nClassif, nFeatures)
     val resultCatcher = runForFiles(runner)(filenames)
 
-    //    resultCatcher.writeScores(Array(nClassif.toString, coefficients.getAllCoefficients.mkString("_")))
+    resultCatcher.writeScores(Array(nClassif.toString))
   }
 
   private def runForFiles(runner: Runner)(filenames: Array[String]): ResultCatcher = {
