@@ -8,7 +8,7 @@ import jb.parser.TreeParser
 import jb.prediction.Predictions.predictBaseClfs
 import jb.selector.FeatureSelectors
 import jb.server.SparkEmbedded
-import jb.tester.FullTester.{testMv, testRF}
+import jb.tester.FullTester.{testI, testMv, testRF}
 import jb.util.Const._
 import jb.util.Util._
 import jb.vectorizer.FeatureVectorizers.getFeatureVectorizer
@@ -64,20 +64,21 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
       .maxBy { case (_, weight) => weight }
       ._1
 
-    val cubes = new TreeParser(mappingFunction).composeTree(baseModels.toList) // TODO: parametrize with weighting function
+    val integratedModel = new TreeParser(mappingFunction).composeTree(baseModels.toList) // TODO: parametrize with weighting function
+    integratedModel.checkDiversity(filename)
 
     //    val integratedModel =
     //      if (coefficients.onlyEdgeDependent) new EdgeIntegratedDecisionTreeModel(baseModels, singleMapping(coefficients), sumOfWeights, edges)
     //      else if (coefficients.onlyMomentDependent) new MomentIntegratedDecisionTreeModel(baseModels, singleMapping(coefficients), sumOfWeights, moments)
     //      else new CombinedIntegratedDecisionTreeModel(baseModels, composedMapping(coefficients), sumOfWeights, edges, moments)
-    //    val iPredictions = integratedModel.transform(testedSubset)
-    //    val iQualityMeasure = testI(iPredictions, testedSubset)
+    val iPredictions = integratedModel.transform(testedSubset)
+    val iQualityMeasure = testI(iPredictions, testedSubset)
 
     clearCache(subsets)
 
     Array(mvQualityMeasure._1, if (mvQualityMeasure._2.isNaN) 0D else mvQualityMeasure._2, mvQualityMeasure._3, mvQualityMeasure._4,
-      rfQualityMeasure._1, if (rfQualityMeasure._2.isNaN) 0D else rfQualityMeasure._2, rfQualityMeasure._3, rfQualityMeasure._4)
-    //      iQualityMeasure._1, if (iQualityMeasure._2.isNaN) 0D else iQualityMeasure._2, iQualityMeasure._3, iQualityMeasure._4)
+      rfQualityMeasure._1, if (rfQualityMeasure._2.isNaN) 0D else rfQualityMeasure._2, rfQualityMeasure._3, rfQualityMeasure._4,
+      iQualityMeasure._1, if (iQualityMeasure._2.isNaN) 0D else iQualityMeasure._2, iQualityMeasure._3, iQualityMeasure._4)
 
   }
 

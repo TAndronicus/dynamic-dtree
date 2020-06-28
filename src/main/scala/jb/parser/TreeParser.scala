@@ -1,6 +1,6 @@
 package jb.parser
 
-import jb.model.{CountingCube, Cube, LabelledCube, WeightingCube}
+import jb.model._
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.tree.{ContinuousSplit, InternalNode, LeafNode, Node}
 
@@ -9,7 +9,8 @@ class TreeParser(mappingFunction: Map[Double, Map[Double, Int]] => Double) {
   def composeTree(trees: List[DecisionTreeClassificationModel]) = {
     val cubes = extractCubes(trees)
     val pairedCubes = pairWithNeigbors(cubes)
-    voteForLabel(pairedCubes)
+    val labelledCubes = voteForLabel(pairedCubes)
+    new IntegratedModel(labelledCubes)
     //    (extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees) // TODO: compose functions: https://stackoverflow.com/questions/20292439/understanding-andthen, cats p. 53
   }
 
