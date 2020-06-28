@@ -18,7 +18,7 @@ object Util {
     for (max <- maxes) require(max == 1)
   }
 
-  def getExtrema(input: DataFrame, selectedFeatures: Array[Int]): Unit = {
+  def chackExtrema(input: DataFrame, selectedFeatures: Array[Int]): Unit = {
     var paramMap = List.newBuilder[(String, String)]
     for (item <- selectedFeatures.sorted; fun <- Array("min", "max")) {
       paramMap += (COL_PREFIX + item -> fun)
