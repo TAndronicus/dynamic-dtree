@@ -9,11 +9,9 @@ import jb.prediction.Predictions.predictBaseClfs
 import jb.selector.FeatureSelectors
 import jb.server.SparkEmbedded
 import jb.tester.FullTester.{testI, testMv, testRF}
-import jb.util.Const._
 import jb.util.Util._
 import jb.vectorizer.FeatureVectorizers.getFeatureVectorizer
 import org.apache.spark.ml.Pipeline
-import org.apache.spark.ml.classification.DecisionTreeClassifier
 
 class Runner(val nClassif: Int, var nFeatures: Int) {
 
@@ -41,29 +39,13 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
     val (trainingSubsets, testSubset) = dispenseSubsets(subsets)
     val trainingSubset = unionSubsets(trainingSubsets)
 
-    def getEmptyDT = {
-      new DecisionTreeClassifier()
-        .setLabelCol(LABEL)
-        .setFeaturesCol(FEATURES)
-        .setImpurity(Config.impurity)
-        .setMaxDepth(Config.maxDepth)
-    }
-
     val baseModels = trainingSubsets.map(subset => getEmptyDT.fit(subset))
 
     val testedSubset = predictBaseClfs(baseModels, testSubset)
     val mvQualityMeasure = testMv(testedSubset, nClassif)
     val rfQualityMeasure = testRF(trainingSubset, testSubset, nClassif)
 
-    val mappingFunction: Map[Double, Map[Double, Int]] => Double = _
-      .map { case (dist, labels) => labels.mapValues(_ * (1 - dist)) }
-      .reduce((m1, m2) => (m1.toSeq ++ m2.toSeq)
-        .groupBy(_._1)
-        .mapValues(_.map(_._2).sum)) // TODO: compose with type classes: https://stackoverflow.com/questions/20047080/scala-merge-map
-      .maxBy { case (_, weight) => weight }
-      ._1
-
-    val integratedModel = new TreeParser(mappingFunction).composeTree(baseModels.toList) // TODO: parametrize with weighting function
+    val integratedModel = new TreeParser(Config.mappingFunction).composeTree(baseModels.toList)
     integratedModel.checkDiversity(filename)
 
     val iPredictions = integratedModel.transform(testedSubset)

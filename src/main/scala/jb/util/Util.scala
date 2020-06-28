@@ -1,9 +1,10 @@
 package jb.util
 
+import jb.conf.Config
 import jb.server.SparkEmbedded
 import jb.util.Const._
 import org.apache.spark.ml.PipelineModel
-import org.apache.spark.ml.classification.DecisionTreeClassificationModel
+import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, DecisionTreeClassifier}
 import org.apache.spark.ml.feature.ChiSqSelectorModel
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DoubleType, LongType, StructField, StructType}
@@ -182,6 +183,14 @@ object Util {
     aggregate.unpersist
     weightedMoments.unpersist
     moments.toMap
+  }
+
+  def getEmptyDT = {
+    new DecisionTreeClassifier()
+      .setLabelCol(LABEL)
+      .setFeaturesCol(FEATURES)
+      .setImpurity(Config.impurity)
+      .setMaxDepth(Config.maxDepth)
   }
 
 }
