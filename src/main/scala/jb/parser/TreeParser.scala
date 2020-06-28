@@ -9,28 +9,31 @@ class TreeParser(
                   mappingFunction: Map[Double, Map[Double, Int]] => Double
                 ) {
 
-  def composeTree(trees: List[DecisionTreeClassificationModel]) = {
-    val cubes = extractCubes(trees)
-    val pairedCubes = pairWithNeigbors(cubes)
-    val labelledCubes = voteForLabel(pairedCubes)
-    new IntegratedModel(labelledCubes)
-    //    new IntegratedModel((extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees)) // TODO: compose functions: https://stackoverflow.com/questions/20292439/understanding-andthen, cats p. 53
-  }
-
-  private def pairWithNeigbors(cubes: List[CountingCube]): Map[CountingCube, List[WeightingCube]] =
+  private val pairWithNeigbors = (cubes: List[CountingCube]) =>
     (for {
       cube <- cubes
       neighbor <- cubes if cube isNeighborOf neighbor
     } yield (cube, neighbor.withDistance(metricFunction(cube, neighbor))))
       .groupBy { case (center, _) => center }
       .mapValues(_.map(_._2))
-
-  private def voteForLabel(cubes: Map[CountingCube, List[WeightingCube]]): List[LabelledCube] =
+  private val voteForLabel = (cubes: Map[CountingCube, List[WeightingCube]]) =>
     cubes
       .mapValues(_.map(wc => (wc.distance, wc.labelCount)).toMap)
       .mapValues(mappingFunction)
       .map { case (cc, label) => LabelledCube(cc.min, cc.max, label) }
       .toList
+  private val extractCubes = (trees: List[DecisionTreeClassificationModel]) => {
+    val (x1cutpoints, x2cutpoints) = trees.map(_.rootNode)
+      .flatMap(extractCutpointsRecursively)
+      .distinct
+      .partition({ case (feature, _) => feature == 0 })
+    cutpointsCrossProd(
+      extractCutpointsFromPartitions(x1cutpoints),
+      extractCutpointsFromPartitions(x2cutpoints)
+    )
+      .map { case ((minX1, maxX1), (minX2, maxX2)) => Cube(List(minX1, minX2), List(maxX1, maxX2)) }
+      .map(cube => CountingCube.fromCube(cube, classifyMid(cube, trees)))
+  }
 
   private def extractCutpointsRecursively(tree: Node): List[Tuple2[Int, Double]] = {
     tree match {
@@ -46,17 +49,8 @@ class TreeParser(
     }
   }
 
-  private def extractCubes(trees: List[DecisionTreeClassificationModel]): List[CountingCube] = {
-    val (x1cutpoints, x2cutpoints) = trees.map(_.rootNode)
-      .flatMap(extractCutpointsRecursively)
-      .distinct
-      .partition({ case (feature, _) => feature == 0 })
-    cutpointsCrossProd(
-      extractCutpointsFromPartitions(x1cutpoints),
-      extractCutpointsFromPartitions(x2cutpoints)
-    )
-      .map { case ((minX1, maxX1), (minX2, maxX2)) => Cube(List(minX1, minX2), List(maxX1, maxX2)) }
-      .map(cube => CountingCube.fromCube(cube, classifyMid(cube, trees)))
+  def composeTree(trees: List[DecisionTreeClassificationModel]) = {
+    new IntegratedModel((extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees))
   }
 
   private def classifyMid(cube: Cube, trees: List[DecisionTreeClassificationModel]) = trees
