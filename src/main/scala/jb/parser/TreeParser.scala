@@ -10,7 +10,7 @@ class TreeParser(mappingFunction: Map[Double, Map[Double, Int]] => Double) {
     val cubes = extractCubes(trees)
     val pairedCubes = pairWithNeigbors(cubes)
     voteForLabel(pairedCubes)
-    //    (extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees) // TODO: compose functions: https://stackoverflow.com/questions/20292439/understanding-andthen
+    //    (extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees) // TODO: compose functions: https://stackoverflow.com/questions/20292439/understanding-andthen, cats p. 53
   }
 
   private def pairWithNeigbors(cubes: List[CountingCube]): Map[CountingCube, List[WeightingCube]] =
