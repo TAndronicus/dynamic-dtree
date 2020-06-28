@@ -1,6 +1,7 @@
 package jb.conf
 
-import jb.util.functions.WeightingFunctions
+import jb.model.CountingCube
+import jb.util.functions.{MetricFunctions, WeightingFunctions}
 
 object Config {
 
@@ -8,7 +9,8 @@ object Config {
   val maxDepth: Int = 3
   val impurity = "gini"
 
-  /** Mapping */
+  /** Parametrizing */
+  val metricFunction: (CountingCube, CountingCube) => Double = MetricFunctions.constant // TODO: parametrize
   val mappingFunction: Map[Double, Map[Double, Int]] => Double = WeightingFunctions.linear
 
   /** Result catcher */

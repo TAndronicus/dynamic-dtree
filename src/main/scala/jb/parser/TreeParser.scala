@@ -4,21 +4,24 @@ import jb.model._
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.tree.{ContinuousSplit, InternalNode, LeafNode, Node}
 
-class TreeParser(mappingFunction: Map[Double, Map[Double, Int]] => Double) {
+class TreeParser(
+                  metricFunction: (CountingCube, CountingCube) => Double,
+                  mappingFunction: Map[Double, Map[Double, Int]] => Double
+                ) {
 
   def composeTree(trees: List[DecisionTreeClassificationModel]) = {
     val cubes = extractCubes(trees)
     val pairedCubes = pairWithNeigbors(cubes)
     val labelledCubes = voteForLabel(pairedCubes)
     new IntegratedModel(labelledCubes)
-    //    (extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees) // TODO: compose functions: https://stackoverflow.com/questions/20292439/understanding-andthen, cats p. 53
+    //    new IntegratedModel((extractCubes andThen pairWithNeigbors andThen voteForLabel) (trees)) // TODO: compose functions: https://stackoverflow.com/questions/20292439/understanding-andthen, cats p. 53
   }
 
   private def pairWithNeigbors(cubes: List[CountingCube]): Map[CountingCube, List[WeightingCube]] =
     (for {
       cube <- cubes
       neighbor <- cubes if cube isNeighborOf neighbor
-    } yield (cube, neighbor.withDistance(0))) // TODO: weight
+    } yield (cube, neighbor.withDistance(metricFunction(cube, neighbor)))) // TODO: weight
       .groupBy { case (center, _) => center }
       .mapValues(_.map(_._2))
 

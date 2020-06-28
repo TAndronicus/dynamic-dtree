@@ -45,7 +45,10 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
     val mvQualityMeasure = testMv(testedSubset, nClassif)
     val rfQualityMeasure = testRF(trainingSubset, testSubset, nClassif)
 
-    val integratedModel = new TreeParser(Config.mappingFunction).composeTree(baseModels.toList)
+    val integratedModel = new TreeParser(
+      Config.metricFunction,
+      Config.mappingFunction
+    ).composeTree(baseModels.toList)
     integratedModel.checkDiversity(filename)
 
     val iPredictions = integratedModel.transform(testedSubset)
