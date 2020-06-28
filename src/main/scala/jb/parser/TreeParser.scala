@@ -21,7 +21,7 @@ class TreeParser(
     (for {
       cube <- cubes
       neighbor <- cubes if cube isNeighborOf neighbor
-    } yield (cube, neighbor.withDistance(metricFunction(cube, neighbor)))) // TODO: weight
+    } yield (cube, neighbor.withDistance(metricFunction(cube, neighbor))))
       .groupBy { case (center, _) => center }
       .mapValues(_.map(_._2))
 
