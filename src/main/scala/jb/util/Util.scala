@@ -191,6 +191,7 @@ object Util {
       .setFeaturesCol(FEATURES)
       .setImpurity(Config.impurity)
       .setMaxDepth(Config.maxDepth)
+      .setMaxBins(Config.maxBins)
   }
 
 }

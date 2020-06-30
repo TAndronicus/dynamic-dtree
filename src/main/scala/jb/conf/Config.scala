@@ -6,12 +6,13 @@ import jb.util.functions.{MetricFunctions, WeightingFunctions}
 object Config {
 
   /** Models */
-  val maxDepth: Int = 3
+  val maxDepth: Int = 10
   val impurity = "gini"
+  val maxBins = 64
 
   /** Parametrizing */
-  val metricFunction: (CountingCube, CountingCube) => Double = MetricFunctions.constant // TODO: parametrize
-  val mappingFunction: Map[Double, Map[Double, Int]] => Double = WeightingFunctions.linear
+  val metricFunction: (CountingCube, CountingCube) => Double = MetricFunctions.manhattan
+  val mappingFunction: Map[Double, Map[Double, Int]] => Double = WeightingFunctions.halfByDist
 
   /** Result catcher */
   val treshold: Double = .4
