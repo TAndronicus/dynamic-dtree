@@ -18,6 +18,9 @@ case class CountingCube(min: List[Double], max: List[Double], labelCount: Map[Do
         || cube.max(index) == max(index))
 
   def withDistance(dist: Double) = WeightingCube(min, max, labelCount, dist)
+
+  val getMid = min.zip(max)
+    .map { case (xMin, xMax) => (xMin + xMax) / 2 }
 }
 
 object CountingCube {
