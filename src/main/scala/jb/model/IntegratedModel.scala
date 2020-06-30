@@ -6,7 +6,7 @@ import org.apache.spark.sql.DataFrame
 
 class IntegratedModel(cubes: List[LabelledCube]) {
 
-  def transform(dataframe: DataFrame): Array[Double] = //TODO: rewrite to operate on dataset using spark dsl
+  def transform(dataframe: DataFrame): Array[Double] =
     dataframe.select(Const.FEATURES)
       .collect()
       .map(_.toSeq.head)
