@@ -11,7 +11,7 @@ object Config {
   val maxBins = 64
 
   /** Parametrizing */
-  val metricFunction: (CountingCube, CountingCube) => Double = MetricFunctions.manhattan
+  val metricFunction: (CountingCube, CountingCube) => Double = MetricFunctions.euclidean
   val mappingFunction: Map[Double, Map[Double, Int]] => Double = WeightingFunctions.halfByDist
 
   /** Result catcher */
