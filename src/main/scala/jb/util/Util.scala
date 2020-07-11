@@ -19,11 +19,13 @@ object Util {
       .orderBy(Const.SPARSE_LABEL)
       .dropDuplicates()
       .collect()
-      .map(_.getInt(0))
+      .map(_.get(0).toString)
       .zipWithIndex
       .toMap
     val mapper = columnMapping(_)
-    input.withColumn(Const.LABEL, udf(mapper).apply(col(SPARSE_LABEL)))
+    input.withColumn(Const.LABEL, udf(mapper)
+      .apply(col(SPARSE_LABEL)))
+      .drop(Const.SPARSE_LABEL)
   }
 
   def optimizeInput(input: DataFrame, dataPrepModel: PipelineModel): DataFrame = {
