@@ -1,14 +1,27 @@
+aa - https://archive.ics.uci.edu/ml/datasets/2.4+GHZ+Indoor+Channel+Measurements
+ap - appendicitis
 bi - biodeg,
 bu - bupa,
 c - cryotherapy
 d - data_banknote_authentication
+ec -ecoli
 h - haberman
 i - ionosphere
 m - meter_a
+ma - magic
 p - pop_failures
+ph - phoneme
+pi - pima
+sb - spambase
 se - seismic_bumps
 so - sonar
 sp - spectfheart
+ri - ring
 t - twonorm
+th - thyroid
+ti - titanic
+ye - yeast
 wd - wdbc
 wi - wisconsin
+wr - wine quality red
+ww - wine quality white
