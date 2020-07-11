@@ -9,6 +9,7 @@ object Config {
   val maxDepth: Int = 10
   val impurity = "gini"
   val maxBins = 64
+  val datasetSize = 10000
 
   /** Parametrizing */
   val metricFunction: (CountingCube, CountingCube) => Double = MetricFunctions.euclidean
