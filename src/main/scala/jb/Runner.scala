@@ -9,9 +9,11 @@ import jb.prediction.Predictions.predictBaseClfs
 import jb.selector.FeatureSelectors
 import jb.server.SparkEmbedded
 import jb.tester.FullTester.{testI, testMv, testRF}
+import jb.util.Const
 import jb.util.Util._
 import jb.vectorizer.FeatureVectorizers.getFeatureVectorizer
 import org.apache.spark.ml.Pipeline
+import org.apache.spark.ml.feature.MinMaxScaler
 
 class Runner(val nClassif: Int, var nFeatures: Int) {
 
@@ -21,17 +23,17 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
     SparkEmbedded.ss.sqlContext.clearCache()
 
     var input = getRawInput(filename, "csv")
+    input = densifyLabel(input)
     if (nFeatures > input.columns.length - 1) {
       this.nFeatures = input.columns.length - 1
       println(s"Setting nFeatures to $nFeatures")
     }
     val featureVectorizer = getFeatureVectorizer(input.columns)
     val featureSelector = FeatureSelectors.get_chi_sq_selector(nFeatures)
-    val dataPrepPipeline = new Pipeline().setStages(Array(featureVectorizer, featureSelector))
+    val scaler = new MinMaxScaler().setInputCol(Const.NON_SCALED_FEATURES).setOutputCol(Const.FEATURES)
+    val dataPrepPipeline = new Pipeline().setStages(Array(featureVectorizer, featureSelector, scaler))
     val dataPrepModel = dataPrepPipeline.fit(input)
     input = optimizeInput(input, dataPrepModel)
-
-    chackExtrema(input, getSelectedFeatures(dataPrepModel))
 
     val nSubsets = nClassif + 1
     val subsets = input.randomSplit(IntStream.range(0, nSubsets).mapToDouble(_ => 1D / nSubsets).toArray)

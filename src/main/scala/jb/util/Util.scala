@@ -14,21 +14,16 @@ import scala.collection.mutable
 
 object Util {
 
-  def requireNormalized(mins: Array[Double], maxes: Array[Double]) = {
-    for (min <- mins) require(min == 0)
-    for (max <- maxes) require(max == 1)
-  }
-
-  def chackExtrema(input: DataFrame, selectedFeatures: Array[Int]): Unit = {
-    var paramMap = List.newBuilder[(String, String)]
-    for (item <- selectedFeatures.sorted; fun <- Array("min", "max")) {
-      paramMap += (COL_PREFIX + item -> fun)
-    }
-    val extrema = input.agg(paramMap.result().head, paramMap.result().drop(1): _*).head.toSeq.toIndexedSeq
-    requireNormalized(
-      extrema.sliding(1, 2).flatten.map(value => parseDouble(value)).toArray,
-      extrema.drop(1).sliding(1, 2).flatten.map(value => parseDouble(value)).toArray
-    )
+  def densifyLabel(input: DataFrame): DataFrame = {
+    val columnMapping = input.select(Const.SPARSE_LABEL)
+      .orderBy(Const.SPARSE_LABEL)
+      .dropDuplicates()
+      .collect()
+      .map(_.getInt(0))
+      .zipWithIndex
+      .toMap
+    val mapper = columnMapping(_)
+    input.withColumn(Const.LABEL, udf(mapper).apply(col(SPARSE_LABEL)))
   }
 
   def optimizeInput(input: DataFrame, dataPrepModel: PipelineModel): DataFrame = {
