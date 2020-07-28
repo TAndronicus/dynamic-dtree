@@ -1,10 +1,8 @@
 package jb.tester
 
 import jb.conf.Config
-import jb.server.SparkEmbedded
 import jb.util.Const.{FEATURES, LABEL, PREDICTION}
 import org.apache.spark.ml.classification.RandomForestClassifier
-import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.sql.DataFrame
 
 object FullTester {
@@ -24,17 +22,42 @@ object FullTester {
     }
   }
 
+  def fScore(precission: Double, recall: Double, beta: Double) = (math.pow(beta, 2) + 1) * precission * recall / (math.pow(beta, 2) * precission + recall)
+
   private def calculateStatistics(predLabels: Array[Double], refLabels: Array[Double]): (Double, Double, Double, Double) = {
-    val metrics = new BinaryClassificationMetrics(SparkEmbedded.ss.sparkContext.parallelize(predLabels.zip(refLabels)))
-    val f1 = metrics.fMeasureByThreshold().map(_._2).max
-    val auroc = metrics.areaUnderROC()
-    metrics.unpersist()
-    val matched = predLabels.indices.map(i => (predLabels(i), refLabels(i))).groupBy(identity).mapValues(_.size)
-    val (tp, tn, fp, fn) = (matched.getOrElse((1, 1), 0), matched.getOrElse((0, 0), 0), matched.getOrElse((1, 0), 0), matched.getOrElse((0, 1), 0))
-    ((tp + tn).toDouble / (tp + tn + fp + fn),
-      (tp * tn - fp * fn).toDouble / math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)),
-      f1,
-      auroc)
+    val before = System.currentTimeMillis()
+    val allIndexesSize = refLabels.size.toDouble
+    val allLabels = refLabels.distinct
+    val indexMap = allLabels.map(
+      label => (
+        refLabels.zipWithIndex.collect { case (l, i) if (l == label) => i }.toSet,
+        predLabels.zipWithIndex.collect { case (l, i) if (l == label) => i }.toSet
+      )
+    )
+    val acc = indexMap
+      .map { case (ref, pred) => (allIndexesSize - ((ref ++ pred).size - (ref & pred).size)) / allIndexesSize }
+      .sum / allLabels.size
+    val precissionMi = indexMap
+      .map { case (ref, pred) => (ref & pred).size }
+      .sum.toDouble / indexMap
+      .map { case (_, pred) => pred.size }
+      .sum
+    val recallMi = indexMap
+      .map { case (ref, pred) => (ref & pred).size }
+      .sum.toDouble / indexMap
+      .map { case (ref, _) => ref.size }
+      .sum
+    val precissionM = indexMap
+      .map { case (ref, pred) => (ref & pred).size.toDouble / pred.size }
+      .filter(!_.isNaN)
+      .sum / allLabels.size
+    val recallM = indexMap
+      .map { case (ref, pred) => (ref & pred).size.toDouble / ref.size }
+      .filter(!_.isNaN)
+      .sum / allLabels.size
+    println(s"Evaluated in ${System.currentTimeMillis() - before}")
+    println(s"ACC: $acc,\tpMi: $precissionMi,\trMi: $recallMi,\tpM: $precissionM,\trM: $recallM,\tfSMi: ${fScore(precissionMi, recallMi, 1)},\tfSM: ${fScore(precissionM, recallM, 1)}")
+    (precissionMi, recallMi, precissionM, recallM)
   }
 
   def testI(predictions: Array[Double], testSubset: DataFrame): (Double, Double, Double, Double) = {
