@@ -29,7 +29,6 @@ object FullTester {
   }
 
   private def calculateStatistics(predLabels: Array[Double], refLabels: Array[Double]): Measurements = {
-    val before = System.currentTimeMillis()
     val allIndexesSize = refLabels.length.toDouble
     val allLabels = refLabels.distinct
     val indexMap = allLabels.map(
@@ -59,8 +58,6 @@ object FullTester {
       .map { case (ref, pred) => (ref & pred).size.toDouble / ref.size }
       .filter(!_.isNaN)
       .sum / allLabels.length
-    println(s"Evaluated in ${System.currentTimeMillis() - before}")
-    println(s"ACC: $acc,\tpMi: $precissionMi,\trMi: $recallMi,\tpM: $precissionM,\trM: $recallM,\tfSMi: ${fScore(precissionMi, recallMi, 1)},\tfSM: ${fScore(precissionM, recallM, 1)}")
     Measurements(acc,
       precissionMi, recallMi, fScore(precissionMi, recallMi, 1), // TODO: hardcoded beta
       precissionM, recallM, fScore(precissionM, recallM, 1)
