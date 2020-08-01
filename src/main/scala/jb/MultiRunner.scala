@@ -2,7 +2,7 @@ package jb
 
 import jb.conf.Config
 import jb.util.Const.FILENAME_PREFIX
-import jb.util.result.{LeastBatchExhaustiveResultCatcher, ResultCatcher}
+import jb.util.result.{GeneralCatcher, ResultCatcher}
 
 object MultiRunner {
 
@@ -63,7 +63,7 @@ object MultiRunner {
   }
 
   private def getResultCatcher: ResultCatcher = {
-    new LeastBatchExhaustiveResultCatcher(Config.treshold, Config.batch, Config.minIter, Config.maxIter)
+    new GeneralCatcher(Config.treshold, Config.batch, Config.minIter, Config.maxIter)
   }
 
 }
