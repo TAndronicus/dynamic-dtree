@@ -1,4 +1,4 @@
-package jb
+package jb.scaler
 
 import jb.util.Const
 import org.apache.spark.ml.feature.MinMaxScaler
