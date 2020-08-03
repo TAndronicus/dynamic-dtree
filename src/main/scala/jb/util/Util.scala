@@ -30,11 +30,6 @@ object Util {
   }
 
   def optimizeInput(input: DataFrame, dataPrepModel: PipelineModel): DataFrame = {
-    val transformed = dataPrepModel.transform(input)
-    transformed.select(
-      Util.getSelectedFeatures(dataPrepModel).map(
-        item => col(COL_PREFIX + item)
-      ).+:(col(FEATURES)).+:(col(LABEL)): _*
     val selected = Util.getSelectedFeatures(dataPrepModel)
     dataPrepModel.transform(input).select(
       col(FEATURES),
