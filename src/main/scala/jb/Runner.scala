@@ -6,6 +6,7 @@ import jb.conf.Config
 import jb.io.FileReader.getRawInput
 import jb.parser.TreeParser
 import jb.prediction.Predictions.predictBaseClfs
+import jb.scaler.FeatureScalers
 import jb.selector.FeatureSelectors
 import jb.server.SparkEmbedded
 import jb.tester.FullTester.{testI, testMv, testRF}
