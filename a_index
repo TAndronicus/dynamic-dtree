@@ -4,23 +4,23 @@ bi - biodeg,
 bu - bupa,
 c - cryotherapy
 d - data_banknote_authentication
-ec -ecoli
+e - ecoli
 h - haberman
-i - ionosphere
-m - meter_a
+io - ionosphere
+me - meter_a
 ma - magic
-p - pop_failures
+po - pop_failures
 ph - phoneme
 pi - pima
 sb - spambase
 se - seismic_bumps
 so - sonar
 sp - spectfheart
-ri - ring
-t - twonorm
+r - ring
+tw - twonorm
 th - thyroid
 ti - titanic
-ye - yeast
+y - yeast
 wd - wdbc
 wi - wisconsin
 wr - wine quality red
