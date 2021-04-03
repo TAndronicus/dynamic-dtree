@@ -4,7 +4,7 @@ import jb.model.CountingCube
 
 object MetricFunctions {
 
-  val constant: (CountingCube, CountingCube) => Double = (cube, neighbor) => 0 // TODO: refactor constant functions to typeclasses & implicits
+  val constant: (CountingCube, CountingCube) => Double = (_, _) => 0
 
   val euclidean: (CountingCube, CountingCube) => Double = (cube, neighbor) => math.sqrt(
     cube.getMid.zip(neighbor.getMid)

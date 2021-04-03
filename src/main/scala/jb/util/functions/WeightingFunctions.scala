@@ -6,7 +6,7 @@ object WeightingFunctions {
     .map { case (dist, labels) => labels.mapValues(_ * (1 - dist)) }
     .reduce((m1, m2) => (m1.toSeq ++ m2.toSeq)
       .groupBy(_._1)
-      .mapValues(_.map(_._2).sum)) // TODO: compose with type classes: https://stackoverflow.com/questions/20047080/scala-merge-map
+      .mapValues(_.map(_._2).sum))
     .maxBy { case (_, weight) => weight }
     ._1
 
@@ -14,7 +14,7 @@ object WeightingFunctions {
     dists.map { case (dist, labels) => labels.mapValues(_ * halfDispatch(dist, dists.keys.sum)) }
       .reduce((m1, m2) => (m1.toSeq ++ m2.toSeq)
         .groupBy(_._1)
-        .mapValues(_.map(_._2).sum)) // TODO: compose with type classes: https://stackoverflow.com/questions/20047080/scala-merge-map
+        .mapValues(_.map(_._2).sum))
       .maxBy { case (_, weight) => weight }
       ._1
   }
