@@ -1,6 +1,9 @@
 package jb
 
 import jb.server.SparkEmbedded
+import jb.util.Const
+
+import java.nio.file.{Files, Paths}
 
 object ExperimentPlan {
 
@@ -9,9 +12,14 @@ object ExperimentPlan {
     val nClassifs = Array(7, 9)
     val nFeatures = 2
 
+    createResultFolderIfNotExists()
     for (nC <- nClassifs) {
       MultiRunner.run(nC, nFeatures)
     }
+  }
+
+  def createResultFolderIfNotExists(): Unit = {
+    if (!Files.exists(Paths.get(Const.RESULT_PREFIX))) Files.createDirectory(Paths.get(Const.RESULT_PREFIX))
   }
 
 }
