@@ -9,16 +9,16 @@ object ExperimentPlan {
 
   def main(args: Array[String]): Unit = {
     SparkEmbedded.setLogError()
-    val nClassifs = Array(7, 9)
+    val nClassifs = Array(3, 5, 7, 9) // number of classifiers to integrate
     val nFeatures = 2
 
-    createResultFolderIfNotExists()
+    createResultFolder()
     for (nC <- nClassifs) {
       MultiRunner.run(nC, nFeatures)
     }
   }
 
-  def createResultFolderIfNotExists(): Unit = {
+  def createResultFolder(): Unit = {
     if (!Files.exists(Paths.get(Const.RESULT_PREFIX))) Files.createDirectory(Paths.get(Const.RESULT_PREFIX))
   }
 

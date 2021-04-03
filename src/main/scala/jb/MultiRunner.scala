@@ -1,43 +1,19 @@
 package jb
 
 import jb.conf.Config
+import jb.util.Const
 import jb.util.Const.FILENAME_PREFIX
 import jb.util.result.{GeneralCatcher, ResultCatcher}
+
+import java.io.File
 
 object MultiRunner {
 
 
   def run(nClassif: Int, nFeatures: Int): Unit = {
-    val filenames = Array(
-      "aa",
-      "ap",
-      "ba",
-      "bi",
-      "bu",
-      "c",
-      "d",
-      "ec",
-      "h",
-      "i",
-      "ir",
-      "m",
-      "ma",
-      "p",
-      "ph",
-      "pi",
-      "ri",
-      "sb",
-      "se",
-      "t",
-      "te",
-      "th",
-      "ti",
-      "wd",
-      "wi",
-      "wr",
-      "ww",
-      "ye"
-    )
+    val filenames = new File(Const.FILENAME_PREFIX)
+      .listFiles()
+      .map(_.getName)
 
     val runner = new Runner(nClassif, nFeatures)
     val resultCatcher = runForFiles(runner)(filenames)

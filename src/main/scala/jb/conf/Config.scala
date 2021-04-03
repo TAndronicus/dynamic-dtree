@@ -22,5 +22,6 @@ object Config {
 
   /** Other */
   val recalculate = false
+  val fScoreBeta = 1
 
 }

@@ -59,8 +59,8 @@ object FullTester {
       .filter(!_.isNaN)
       .sum / allLabels.length
     Measurements(acc,
-      precissionMi, recallMi, fScore(precissionMi, recallMi, 1), // TODO: hardcoded beta
-      precissionM, recallM, fScore(precissionM, recallM, 1)
+      precissionMi, recallMi, fScore(precissionMi, recallMi, Config.fScoreBeta),
+      precissionM, recallM, fScore(precissionM, recallM, Config.fScoreBeta)
     )
   }
 
