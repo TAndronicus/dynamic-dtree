@@ -16,8 +16,8 @@ object Config {
   val mappingFunction: Map[Double, Map[Double, Int]] => Double = WeightingFunctions.halfByDist
 
   /** Result catcher */
+  val batch: Int = 4 // minimal number of results
   val treshold: Double = .4
-  val batch: Int = 4
   val minIter: Int = 10
   val maxIter: Int = 200
 
