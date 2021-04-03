@@ -1,7 +1,5 @@
 package jb
 
-import java.util.stream.IntStream
-
 import jb.conf.Config
 import jb.io.FileReader.getRawInput
 import jb.parser.TreeParser
@@ -13,6 +11,8 @@ import jb.tester.FullTester.{testI, testMv, testRF}
 import jb.util.Util._
 import jb.vectorizer.FeatureVectorizers.getFeatureVectorizer
 import org.apache.spark.ml.Pipeline
+
+import java.util.stream.IntStream
 
 class Runner(val nClassif: Int, var nFeatures: Int) {
 
@@ -47,7 +47,7 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
     val rfQualityMeasure = testRF(trainingSubset, testSubset, nClassif)
 
     val integratedModel = new TreeParser(
-      Config.metricFunction,
+      (c1, c2) => Config.metricFunction(c1.getMid, c2.getMid),
       Config.mappingFunction
     ).composeTree(baseModels.toList)
     integratedModel.checkDiversity(filename)
