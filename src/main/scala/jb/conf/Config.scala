@@ -10,6 +10,7 @@ object Config {
   val maxBins = 64
 
   /** Parametrizing */
+  val numberOfClassifiers: Array[Int] = Array(3, 5, 7)
   val metricFunction: (List[Double], List[Double]) => Double = MetricFunctions.euclidean
   val mappingFunction: Map[Double, Map[Double, Int]] => Double = WeightingFunctions.halfByDist
 
