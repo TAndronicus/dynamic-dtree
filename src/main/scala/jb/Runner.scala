@@ -18,7 +18,6 @@ class Runner(val nClassif: Int, var nFeatures: Int) {
 
   def calculateMvIScores(filename: String): Array[Double] = {
 
-    //    import SparkEmbedded.ss.implicits._
     SparkEmbedded.ss.sqlContext.clearCache()
 
     var input = getRawInput(filename, "csv")
